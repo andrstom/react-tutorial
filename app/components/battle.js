@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   FaUserFriends,
@@ -8,92 +8,76 @@ import {
 } from "react-icons/fa";
 import PropTypes from "prop-types";
 import Results from "./results";
-import { ThemeConsumer } from "../contexts/theme";
+import ThemeContext from "../contexts/theme";
 
 function Instructions() {
+  const theme = React.useContext(ThemeContext);
+
   return (
-    <ThemeConsumer>
-      {({ theme }) => (
-        <div className="instruction-container">
-          <h1 className="center-text header-lg">Instructions</h1>
-          <ol className="container-sm grid center-text battle-instructions">
-            <li>
-              <h3 className="header-sm">Enter to GitHub users</h3>
-              <FaUserFriends
-                className={`bg-${theme}`}
-                color="rgb(255, 191, 116)"
-                size={140}
-              />
-            </li>
-            <li>
-              <h3 className="header-sm">Battle</h3>
-              <FaFighterJet
-                className={`bg-${theme}`}
-                color="#727272"
-                size={140}
-              />
-            </li>
-            <li>
-              <h3 className="header-sm">See the trophy</h3>
-              <FaTrophy
-                className={`bg-${theme}`}
-                color="rgb(255, 215, 0)"
-                size={140}
-              />
-            </li>
-          </ol>
-        </div>
-      )}
-    </ThemeConsumer>
+    <div className="instruction-container">
+      <h1 className="center-text header-lg">Instructions</h1>
+      <ol className="container-sm grid center-text battle-instructions">
+        <li>
+          <h3 className="header-sm">Enter to GitHub users</h3>
+          <FaUserFriends
+            className={`bg-${theme}`}
+            color="rgb(255, 191, 116)"
+            size={140}
+          />
+        </li>
+        <li>
+          <h3 className="header-sm">Battle</h3>
+          <FaFighterJet className={`bg-${theme}`} color="#727272" size={140} />
+        </li>
+        <li>
+          <h3 className="header-sm">See the trophy</h3>
+          <FaTrophy
+            className={`bg-${theme}`}
+            color="rgb(255, 215, 0)"
+            size={140}
+          />
+        </li>
+      </ol>
+    </div>
   );
 }
 
-class PlayerInput extends Component {
-  state = {
-    username: "",
-  };
+function PlayerInput({ onSubmit, label }) {
+  const [username, setUsername] = React.useState("");
+  const theme = React.useContext(ThemeContext);
 
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-
-    this.props.onSubmit(this.state.username);
+    onSubmit(username);
   };
 
-  handleChange = (event) => {
-    this.setState({ username: event.target.value });
-  };
+  const handleChange = (event) => setUsername(event.target.value);
 
-  render() {
-    return (
-      <ThemeConsumer>
-        {({ theme }) => (
-          <form className="column player" onSubmit={this.handleSubmit}>
-            <label htmlFor="username" className="player-label">
-              {this.props.label}
-            </label>
-            <div className="row player-inputs">
-              <input
-                type="text"
-                id="username"
-                className={`input-${theme}`}
-                placeholder="GitHub username"
-                autoComplete="off"
-                value={this.state.username}
-                onChange={this.handleChange}
-              />
-            </div>
-            <button
-              className={`btn ${theme === "dark" ? "dark-btn" : "light-btn"}`}
-              type="submit"
-              disabled={!this.state.username}
-            >
-              Submit
-            </button>
-          </form>
-        )}
-      </ThemeConsumer>
-    );
-  }
+  return (
+    <form className="column player" onSubmit={handleSubmit}>
+      <label htmlFor="username" className="player-label">
+        {label}
+      </label>
+      <div className="row player-inputs">
+        <input
+          type="text"
+          id="username"
+          className={`input-${theme}`}
+          placeholder="GitHub username"
+          autoComplete="off"
+          value={username}
+          onChange={handleChange}
+        />
+      </div>
+      <button
+        className={`btn ${theme === "dark" ? "dark-btn" : "light-btn"}`}
+        type="submit"
+        disabled={!username}
+      >
+        Submit
+      </button>
+    </form>
+  );
 }
 
 PlayerInput.propTypes = {
@@ -102,30 +86,28 @@ PlayerInput.propTypes = {
 };
 
 function PlayerPreview({ username, onReset, label }) {
+  const theme = React.useContext(ThemeContext);
+
   return (
-    <ThemeConsumer>
-      {({ theme }) => (
-        <div className="column player">
-          <div className="player-label">
-            <div className={`row bg-${theme}`}>
-              <div className="player-info">
-                <img
-                  className="avatar-small"
-                  src={`https://github.com/${username}.png?size=200`}
-                  alt={`Avatar for ${username}`}
-                />
-                <a href={`https://github.com/${username}`} className="link">
-                  {username}
-                </a>
-              </div>
-              <button className="btn-clear flex-center" onClick={onReset}>
-                <FaTimesCircle color="rgb(194, 57, 42)" size={26} />
-              </button>
-            </div>
-          </div>
+    <div className="column player">
+      <h3 className="player-label">{label}</h3>
+      <div className={`row bg-${theme}`}>
+        <div className="player-info">
+          <img
+            className="avatar-small"
+            src={`https://github.com/${username}.png?size=200`}
+            alt={`Avatar for ${username}`}
+          />
+          <a href={`https://github.com/${username}`} className="link">
+            {username}
+          </a>
         </div>
-      )}
-    </ThemeConsumer>
+        <button className="btn-clear flex-center" onClick={onReset}>
+          {" "}
+          <FaTimesCircle color="rgb(194, 57, 42)" size={26} />
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -135,74 +117,61 @@ PlayerPreview.propTypes = {
   label: PropTypes.string.isRequired,
 };
 
-class Battle extends Component {
-  state = {
-    playerOne: null,
-    playerTwo: null,
-    battle: false,
-  };
+export default function Battle() {
+  const [playerOne, setPlayerOne] = React.useState(null);
+  const [playerTwo, setPlayerTwo] = React.useState(null);
+  const [battle, setBattle] = React.useState(false);
 
-  handleSubmit = (id, player) => {
-    this.setState({
-      [id]: player,
-    });
-  };
+  const handleSubmit = (id, player) =>
+    id === "playerOne" ? setPlayerOne(player) : setPlayerTwo(player);
 
-  handleReset = (id) => {
-    this.setState({
-      [id]: null,
-    });
-  };
-  render() {
-    const { playerOne, playerTwo } = this.state;
+  const handleReset = (id) =>
+    id === "playerOne" ? setPlayerOne(null) : setPlayerTwo(null);
 
-    return (
-      <React.Fragment>
-        <Instructions />
+  return (
+    <React.Fragment>
+      <Instructions />
 
-        <div className="players-container">
-          <h1 className="center-text header-lg">Players</h1>
-          <div className="row cpace-arround">
-            {playerOne === null ? (
-              <PlayerInput
-                label="Player One"
-                onSubmit={(player) => this.handleSubmit("playerOne", player)}
-              />
-            ) : (
-              <PlayerPreview
-                username={playerOne}
-                label="Player One"
-                onReset={() => this.handleReset("playerOne")}
-              />
-            )}
+      <div className="players-container">
+        <h1 className="center-text header-lg">Players</h1>
+        <div className="row space-arround">
+          {playerOne === null ? (
+            <PlayerInput
+              label="Player One"
+              onSubmit={(player) => handleSubmit("playerOne", player)}
+            />
+          ) : (
+            <PlayerPreview
+              username={playerOne}
+              label="Player One"
+              onReset={() => handleReset("playerOne")}
+            />
+          )}
 
-            {playerTwo === null ? (
-              <PlayerInput
-                label="Player Two"
-                onSubmit={(player) => this.handleSubmit("playerTwo", player)}
-              />
-            ) : (
-              <PlayerPreview
-                username={playerTwo}
-                label="Player Two"
-                onReset={() => this.handleReset("playerTwo")}
-              />
-            )}
-          </div>
-          <Link
-            to={{
-              pathname: "/battle/results",
-              search: `?playerOne=${playerOne}&playerTwo=${playerTwo}`,
-            }}
-            className="btn btn-dark btn-space"
-            onClick={() => this.setState({ battle: true })}
-          >
-            Battle
-          </Link>
+          {playerTwo === null ? (
+            <PlayerInput
+              label="Player Two"
+              onSubmit={(player) => handleSubmit("playerTwo", player)}
+            />
+          ) : (
+            <PlayerPreview
+              username={playerTwo}
+              label="Player Two"
+              onReset={() => handleReset("playerTwo")}
+            />
+          )}
         </div>
-      </React.Fragment>
-    );
-  }
+        <Link
+          to={{
+            pathname: "/battle/results",
+            search: `?playerOne=${playerOne}&playerTwo=${playerTwo}`,
+          }}
+          className="btn btn-dark btn-space"
+          onClick={() => setBattle(true)}
+        >
+          Battle
+        </Link>
+      </div>
+    </React.Fragment>
+  );
 }
-
-export default Battle;

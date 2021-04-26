@@ -1,5 +1,3 @@
-import { FaFutbol } from "react-icons/fa";
-
 const id = "2a55132d80b97503f4c3";
 const sec = "721d20171b023bd82b4ff2e43befd901328a1057";
 const params = `?client_id=${id}&client_secret=${sec}`;
@@ -69,7 +67,7 @@ export function battle(players) {
 
 export function fetchPopularRepos(language) {
   const endpoint = window.encodeURI(
-    "https://api.github.com/search/repositories?q=stars:>1+language:${language}$sort=stars$order=desc$type=Repositories"
+    `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
   );
 
   return fetch(endpoint)

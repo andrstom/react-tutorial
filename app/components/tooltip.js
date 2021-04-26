@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-// import withHover from "./withHover";
-import Hover from "./hover";
+import useHover from "../hooks/useHover";
 
 const styles = {
   container: {
@@ -25,62 +24,11 @@ const styles = {
   },
 };
 
-/*
- * hover efekt - klasitky pristup
- *
+export default function Tooltip({ text, children }) {
+  const [hovering, attrs] = useHover();
 
-class Tooltip extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      hovering: false,
-    };
-
-    this.mouseOver = this.mouseOver.bind(this);
-    this.mouseOut = this.mouseOut.bind(this);
-  }
-
-  mouseOver() {
-    this.setState({
-      hovering: true,
-    });
-  }
-
-  mouseOut() {
-    this.setState({
-      hovering: false,
-    });
-  }
-
-  render() {
-    const { text, children } = this.props;
-    const { hovering } = this.state;
-    return (
-      <div
-        onMouseOver={() => this.mouseOver()}
-        onMouseOut={() => this.mouseOut()}
-        style={styles.container}
-      >
-        {hovering === true && <div style={styles.tooltip}>{text}</div>}
-        {children}
-      </div>
-    );
-  }
-}
-
-Tooltip.propTypes = {
-  text: PropTypes.string.isRequired
-};
-
-export default Tooltip;*/
-
-/**
- * hover efekt - pomoci komponenty vyssiho radu
- *
-function Tooltip({ text, children, hovering }) {
   return (
-    <div style={styles.container}>
+    <div style={styles.container} {...attrs}>
       {hovering === true && <div style={styles.tooltip}>{text}</div>}
       {children}
     </div>
@@ -89,40 +37,4 @@ function Tooltip({ text, children, hovering }) {
 
 Tooltip.propTypes = {
   text: PropTypes.string.isRequired,
-  hovering: PropTypes.bool.isRequired,
 };
-
-export default withHover(Tooltip);
-*/
-
-/**
- * hover efekt - pomoci Render/Children prop
- */
-function Tooltip({ text, children }) {
-  return (
-    // Pomoci CHILDREN, musi byt volana jako funkce === this.props.children()
-    <Hover>
-      {(hovering) => (
-        <div style={styles.container}>
-          {hovering === true && <div style={styles.tooltip}>{text}</div>}
-          {children}
-        </div>
-      )}
-    </Hover>
-
-    /* Pomoci RENDER prop
-    <Hover render={(hovering) => {
-      <div style={styles.container}>
-        {hovering === true && <div style={styles.tooltip}>{text}</div>}
-        {children}
-      </div>
-    }}>
-    */
-  );
-}
-
-Tooltip.propTypes = {
-  text: PropTypes.string.isRequired,
-};
-
-export default Tooltip;
